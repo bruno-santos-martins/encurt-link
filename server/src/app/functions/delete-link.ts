@@ -17,10 +17,14 @@ export async function deleteLink(
 
   const result = await db
     .delete(schema.links)
-    .where(eq(schema.links.id, id));
+    .where(eq(schema.links.id, id))
+    .returning();
 
-  const deleted = result.changes ?? 0;
+  console.log(result.length);
 
+  const deleted = result.length ?? 0;
+  
+  
   if (deleted === 0) {
     return makeLeft('Link não encontrado.');
   }

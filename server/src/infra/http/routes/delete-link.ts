@@ -14,16 +14,18 @@ export const deleteLinkRoute: FastifyPluginAsyncZod = async (server) => {
           id: z.string().uuid(),
         }),
         response: {
-          204: z.null().describe('Link deletado com sucesso'),
+          201: z.object({ message: z.string() }).describe('Link deletado com sucesso'),
           400: z.object({ message: z.string() }).describe('Link não encontrado'),
         },
       },
     },
     async (request, reply) => {
+     
+
       const result = await deleteLink({ id: request.params.id });
 
       if (isRight(result)) {
-        return reply.status(204).send();
+        return reply.status(201).send({ message: 'Link deletado com sucesso' });
       }
 
       const error = unwrapEither(result);

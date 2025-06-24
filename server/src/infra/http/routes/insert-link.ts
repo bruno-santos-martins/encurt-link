@@ -16,12 +16,12 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
           urlCurt: z.string(),
         }),
 				response: {
-					201: z.object({ uploadId: z.string() }).describe('Image uploaded'),
+					201: z.string().describe('Cadastro Realizado.'),
 					400: z
 						.object({
 							message: z.string(),
 						})
-						.describe('Upload already exists.'),
+						.describe('Falha no envio.'),
 				},
 			},
 		},
@@ -34,7 +34,7 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
 			})
 
 			if (isRight(result)) {
-				return reply.status(201).send()
+				return reply.status(201).send('Cadastro Realizado')
 			}
 
 			const error = unwrapEither(result)
