@@ -8,7 +8,7 @@ export const links = pgTable('links', {
 	url: text('url').notNull().unique(),
 	urlCurt: text('url_curt').notNull().unique(),
 	visited: integer('visited').default(0).notNull(),
-	createdAt: timestamp('created_at', { withTimezone: true })
+	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
 		.defaultNow()
 		.notNull(),
 })

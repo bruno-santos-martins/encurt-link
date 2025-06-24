@@ -15,7 +15,7 @@ export async function insertLink(
   input: LinkInput
 ): Promise<Either<string, LinkInput>> {
   const { url, urlCurt } = linkInputSchema.parse(input);
-  //const con = await db.execute(`SELECT * from links`);
+
   const existing = await db
     .select()
     .from(schema.links)

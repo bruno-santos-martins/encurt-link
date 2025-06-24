@@ -1,7 +1,4 @@
 import { insertLink } from '@/app/functions/insert-url.js'
-import { uploadImage } from '@/app/functions/upload-image.js'
-import { db } from '@/infra/db/index.js'
-import { schema } from '@/infra/db/schemas/index.js'
 import { isRight, unwrapEither } from '@/shared/either.js'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -28,6 +25,7 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
 				},
 			},
 		},
+
 		async (request, reply) => {
 			
       const result = await insertLink({
@@ -40,16 +38,11 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
 			}
 
 			const error = unwrapEither(result)
+
 			return reply.status(400).send({
-				message: error.message,
+				message: error,
 			})
       
-			switch (error.constructor.name) {
-				case 'InvalidFileFormat':
-					return reply.status(400).send({
-						message: error.message,
-					})
-			}
 					
 		}
 	)

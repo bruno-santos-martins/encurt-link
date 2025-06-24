@@ -13,6 +13,7 @@ import {
 
 import { transformSwaggerSchema } from './transform-swagger-schema.js'
 import { inserLinkRoute } from './routes/insert-link.js'
+import { getAllLinksRoute } from './routes/get-all-links.js'
 const server = fastify()
 
 server.register(fastifyMultipart)
@@ -48,6 +49,7 @@ server.setErrorHandler((error, request, reply) => {
 
 server.register(fastifyCors, { origin: '*' })
 server.register(inserLinkRoute)
+server.register(getAllLinksRoute);
 
 server.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
 	console.log('HTTP server running!')
