@@ -15,6 +15,9 @@ import { transformSwaggerSchema } from './transform-swagger-schema.js'
 import { inserLinkRoute } from './routes/insert-link.js'
 import { getAllLinksRoute } from './routes/get-all-links.js'
 import { deleteLinkRoute } from './routes/delete-link.js'
+import { getOriginalUrlRoute } from './routes/get-original-link.js'
+import { redirectCountRoute } from './routes/count-click-link.js'
+
 const server = fastify()
 
 server.register(fastifyMultipart)
@@ -42,9 +45,6 @@ server.setErrorHandler((error, request, reply) => {
 		})
 	}
 
-	// Envia o erro p/ alguma ferramenta de observabilidade (Sentry/Datadog/Grafana/Otel)
-
-
 	return reply.status(500).send({ message: 'Internal server error.' })
 })
 
@@ -52,6 +52,8 @@ server.register(fastifyCors, { origin: '*' })
 server.register(inserLinkRoute)
 server.register(getAllLinksRoute);
 server.register(deleteLinkRoute);
+server.register(getOriginalUrlRoute);
+server.register(redirectCountRoute);
 
 server.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
 	console.log('HTTP server running!')

@@ -20,7 +20,6 @@ export const deleteLinkRoute: FastifyPluginAsyncZod = async (server) => {
       },
     },
     async (request, reply) => {
-     
 
       const result = await deleteLink({ id: request.params.id });
 
