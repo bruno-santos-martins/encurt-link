@@ -1,15 +1,65 @@
+import logo from "../img/logo.png";
+import linkIcon from "../img/link.png";
+import iconCopy from "../img/icon-copy.png";
+import icontrash from "../img/icon-trash.png";
+
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { api } from "../util/api";
+
+const apitWeb = import.meta.env.VITE_WEB_URL;
+
+type Link = {
+  id: string;
+  url: string;
+  urlCurt: string;
+  createdAt: string;
+  visited: number;
+};
+
+type FormData = {
+  url: string;
+  urlCurt: string;
+};
+
 export function NewLink() {
+  const [links, setLinks] = useState<Link[]>([]);
+  const { register, handleSubmit, reset } = useForm<FormData>();
+
+  useEffect(() => {
+    api
+      .get("/links")
+      .then((response) => {
+        setLinks(response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar links:", error);
+      });
+  }, []);
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response = await api.post("/link", data);
+      setLinks((prev) => [response.data, ...prev]); // Adiciona novo link à lista
+      reset(); // limpa o formulário
+    } catch (error) {
+      console.error("Erro ao salvar link:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col py-8">
-      {/* Logo com responsividade */}
       <div className="mb-6 flex justify-center md:justify-start">
-        <img src="/logo.svg" alt="brev.ly logo" className="h-6" />
+        <img src={logo} alt="brev.ly logo" className="h-6" />
+        <span className="ml-2 text-[#2C46B1] font-bold">brev.ly</span>
       </div>
 
-      {/* Layout principal responsivo */}
-      <div className="max-w-none flex flex-col gap-8 md:flex-row md:justify-center ">
-        {/* Card: Novo link */}
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-none md:max-w-md flex-1 md:w-[600px]">
+      <div className="max-w-none flex flex-col gap-8 md:flex-row md:justify-center">
+        {/* Formulário de novo link */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="bg-white p-8 rounded-lg shadow-md max-w-none md:max-w-md flex-1 md:w-[600px]"
+        >
           <h2 className="text-2xl font-semibold mb-6">Novo link</h2>
 
           <div className="mb-5">
@@ -17,6 +67,7 @@ export function NewLink() {
               Link original
             </label>
             <input
+              {...register("url", { required: true })}
               type="text"
               placeholder="www.exemplo.com.br"
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -27,35 +78,75 @@ export function NewLink() {
             <label className="block text-xs font-medium text-gray-600 mb-1 uppercase">
               Link encurtado
             </label>
-            <input
-              type="text"
-              placeholder="brev.ly/"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
+            <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+              <span className="px-4 py-3 text-gray-500 bg-gray-100 border-r border-gray-300">
+                brev.ly/
+              </span>
+              <input
+                {...register("urlCurt", { required: true })}
+                type="text"
+                placeholder="seu-link"
+                className="flex-1 px-4 py-3 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <button className="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-medium py-3 rounded-md text-base transition">
+          <button
+            type="submit"
+            className="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-medium py-3 rounded-md text-base transition"
+          >
             Salvar link
           </button>
-        </div>
+        </form>
 
         {/* Card: Meus links */}
         <div className="bg-white p-8 rounded-lg shadow-md w-full flex-1 md:w-[700px]">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Meus links</h2>
-            <button className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-md border border-gray-300">
+            <button className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200 transition">
               Baixar CSV
             </button>
           </div>
 
-          <div className="flex flex-col items-center justify-center text-center text-sm text-gray-500 h-40 border-t pt-4">
-            <img
-              src="/link-icon.svg"
-              alt="Link ícone"
-              className="w-6 h-6 mb-2"
-            />
-            AINDA NÃO EXISTEM LINKS CADASTRADOS
-          </div>
+          {!links.length && (
+            <div className="flex flex-col items-center justify-center text-center text-sm text-gray-400 h-40 border-t pt-4">
+              <img src={linkIcon} alt="Link ícone" className="w-6 h-6 mb-2" />
+              AINDA NÃO EXISTEM LINKS CADASTRADOS
+            </div>
+          )}
+
+          <ul className="space-y-4 border-t border-gray-200 pt-4">
+            {links.map((item, i) => (
+              <li
+                key={i}
+                className="border-b border-gray-200 last:border-b-0 pb-2"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <a
+                      href={apitWeb + item.urlCurt}
+                      className="text-sm text-blue-600 font-medium hover:underline"
+                    >
+                      {apitWeb}
+                      {item.urlCurt}
+                    </a>
+                    <p className="text-sm text-gray-500">{item.url}</p>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-sm text-gray-700">
+                      {item.visited} acessos
+                    </span>
+                    <button className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                      <img src={iconCopy} />
+                    </button>
+                    <button className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                      <img src={icontrash} />
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
