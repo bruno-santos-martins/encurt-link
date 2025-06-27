@@ -2,10 +2,11 @@ import logo from "../img/logo.png";
 import linkIcon from "../img/link.png";
 import iconCopy from "../img/icon-copy.png";
 import icontrash from "../img/icon-trash.png";
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "../util/api";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const apitWeb = import.meta.env.VITE_WEB_URL;
 
@@ -17,14 +18,19 @@ type Link = {
   visited: number;
 };
 
-type FormData = {
-  url: string;
-  urlCurt: string;
-};
+const schema = z.object({
+  url: z.string().url("Digite uma URL válida"),
+  urlCurt: z.string().min(1, "Link encurtado é obrigatório"),
+});
+
+type FormData = z.infer<typeof schema>;
+
 
 export function NewLink() {
   const [links, setLinks] = useState<Link[]>([]);
-  const { register, handleSubmit, reset } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
   useEffect(() => {
     api
@@ -72,6 +78,11 @@ export function NewLink() {
               placeholder="www.exemplo.com.br"
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            {errors.url && (
+              <span className="text-red-500 text-sm">
+                {errors.url.message}
+              </span>
+            )}
           </div>
 
           <div className="mb-6">
@@ -134,12 +145,16 @@ export function NewLink() {
                   </div>
                   <div className="flex items-center gap-2 pt-1">
                     <span className="text-sm text-gray-700">
-                      {item.visited} acessos
+                      { item.visited ?? 0 } Acessos
                     </span>
-                    <button className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                    <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${apitWeb + item.urlCurt}`);
+                    }}
+                    title="Copiar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition" >
                       <img src={iconCopy} />
                     </button>
-                    <button className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                    <button title="Deletar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
                       <img src={icontrash} />
                     </button>
                   </div>
