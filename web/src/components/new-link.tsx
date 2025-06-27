@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { api } from "../util/api";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 
 const apitWeb = import.meta.env.VITE_WEB_URL;
 
@@ -28,6 +29,7 @@ type FormData = z.infer<typeof schema>;
 
 export function NewLink() {
   const [links, setLinks] = useState<Link[]>([]);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
@@ -44,12 +46,28 @@ export function NewLink() {
   }, []);
 
   const onSubmit = async (data: FormData) => {
+    setSubmitError("");
     try {
       const response = await api.post("/link", data);
       setLinks((prev) => [response.data, ...prev]); // Adiciona novo link à lista
       reset(); // limpa o formulário
     } catch (error) {
-      console.error("Erro ao salvar link:", error);
+      if (error instanceof AxiosError && error.response) {
+        if (error.response?.status === 409 || error.response?.status === 400) {
+        setSubmitError("Este link já está cadastrado.");
+        } else {
+          setSubmitError("Erro ao salvar o link. Tente novamente.");
+        }
+      }
+    }
+  };
+
+  const handleDeleteLink = async (id: string) => {
+    try {
+      await api.delete(`/link/${id}`);
+      setLinks((prev) => prev.filter((link) => link.id !== id)); // remove da lista
+    } catch (error) {
+      console.error("Erro ao deletar link:", error);
     }
   };
 
@@ -101,7 +119,11 @@ export function NewLink() {
               />
             </div>
           </div>
-
+              {submitError && (
+            <div className="mb-4 text-sm text-red-600 font-medium">
+              {submitError}
+            </div>
+          )}
           <button
             type="submit"
             className="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-medium py-3 rounded-md text-base transition"
@@ -154,7 +176,9 @@ export function NewLink() {
                     title="Copiar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition" >
                       <img src={iconCopy} />
                     </button>
-                    <button title="Deletar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                    <button 
+                      onClick={() => handleDeleteLink(item.id)}
+                      title="Deletar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
                       <img src={icontrash} />
                     </button>
                   </div>
