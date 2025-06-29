@@ -1,10 +1,13 @@
 
-import { NewLink } from "./components/new-link"
+import { AppRoutes } from "./router"
+import { BrowserRouter } from "react-router-dom";
 
 export function App() {
   return (
     <main className="h-dvh flex flex-col items-center justify-center p-4">
-      <NewLink></NewLink>
+      <BrowserRouter>
+        <AppRoutes></AppRoutes>
+      </BrowserRouter>
     </main>
   )
 }
