@@ -6,13 +6,13 @@ import { z } from 'zod';
 
 export const getOriginalUrlRoute: FastifyPluginAsyncZod = async (server) => {
   server.get(
-    '/link',
+    '/link/:curt',
     {
       schema: {
         summary: 'Obter URL original por meio da URL encurtada',
         tags: ['link'],
-        querystring: z.object({
-          urlCurt: z.string(),
+        params: z.object({
+          curt: z.string(),
         }),
         response: {
           200: z.object({ url: z.string().url() }).describe('URL original encontrada'),
@@ -21,8 +21,8 @@ export const getOriginalUrlRoute: FastifyPluginAsyncZod = async (server) => {
       },
     },
     async (request, reply) => {
-      console.log("aqui 2");     
-      const result = await getOriginalUrl({ urlCurt: request.query.urlCurt });
+      //const result = await deleteLink({ id: request.params.id });
+      const result = await getOriginalUrl({ urlCurt: request.params.curt });
        
       if (isRight(result)) {
         const original = result.right;

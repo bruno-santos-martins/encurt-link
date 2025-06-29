@@ -2,7 +2,7 @@ import { db } from '@/infra/db/index.js';
 import { schema } from '@/infra/db/schemas/index.js';
 import { type Either, makeLeft, makeRight } from '@/shared/either.js';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 const getUrlInputSchema = z.object({
   urlCurt: z.string(),
@@ -21,10 +21,14 @@ export async function getOriginalUrl(
     .from(schema.links)
     .where(eq(schema.links.urlCurt, urlCurt));
   
-  console.log(result);
   if (result.length === 0) {
     return makeLeft('URL encurtada não encontrada.');
   }
-
+  
+  await db
+      .update(schema.links)
+      .set({ visited: sql`${schema.links.visited} + 1` })
+      .where(eq(schema.links.url, result[0].url)).returning();
+  
   return makeRight({ url: result[0].url });
 }

@@ -5,7 +5,7 @@ import { api } from "../util/api";
 const apitWeb = import.meta.env.VITE_WEB_URL;
 
 export function NotFound() {
- 
+
 
   useEffect(() => {
     api
