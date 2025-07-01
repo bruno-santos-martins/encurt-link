@@ -2,8 +2,7 @@
 
 Sistema moderno de encurtamento de links com visual limpo, funcionalidade de cópia, contagem de acessos e exportação de dados em CSV. Criado com React + Tailwind e integrado com backend API.
 
-![Preview da Interface]!
-![alt text](image.png)
+![alt text](image-1.png)
 ---
 
 ## 🚀 Funcionalidades
