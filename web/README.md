@@ -1,35 +1,47 @@
-# 🚀 Upload Widget – React + Stream
+# 🔗 Brev.ly – Encurtador de Links
 
-Interface moderna de upload de arquivos em React, com envio via **streaming**, preview em tempo real e testes com **Vitest**. Desenvolvido para ser acoplado facilmente em qualquer sistema.
+Sistema moderno de encurtamento de links com visual limpo, funcionalidade de cópia, contagem de acessos e exportação de dados em CSV. Criado com React + Tailwind e integrado com backend API.
+
+![Preview da Interface](./.github/preview.png)
+
+---
+
+## 🚀 Funcionalidades
+
+- ✅ Encurtamento de links personalizados (ex: `brev.ly/seu-link`)
+- ✅ Contador de acessos para cada link
+- ✅ Cópia rápida do link encurtado
+- ✅ Exclusão de links
+- ✅ Exportação de todos os links para CSV
+- ✅ Interface responsiva e moderna
 
 ---
 
 ## 🧱 Tecnologias Utilizadas
 
-- **React 18**
-- **Vite**
-- **Tailwind CSS**
-- **Radix UI (Collapsible)**
-- **TypeScript**
-- **Vitest** + **Testing Library**
-- **Axios** (com suporte a `FormData` e progress)
+### Frontend
+
+- [React 18](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI (botões e acessibilidade)](https://www.radix-ui.com/)
+- [Axios](https://axios-http.com/)
+
+### Backend
+
+- Node.js com Fastify
+- Drizle ORM + PostgreSQL
+- AWS SDK / Cloudflare R2 para exportação de arquivos
 
 ---
 
-## 📦 Instalação do Backend
+## 📦 Instalação
+
+### 🔹 Clonar o projeto
 
 ```bash
-git clone https://github.com/bruno-santos-martins/ftr-pos-360-upload-widget
-cd ftr-pos-360-upload-widget
-npm install
+git clone https://github.com/seu-usuario/brevly
+cd brevly
 
----
 
-## 📦 Instalação do Backend
-
-```bash
-
-npm install
-npm start dev
-
----
