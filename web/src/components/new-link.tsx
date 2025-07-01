@@ -28,6 +28,7 @@ type FormData = z.infer<typeof schema>;
 
 
 export function NewLink() {
+  const [downloadCsv, setDownloadCsv] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
@@ -68,6 +69,18 @@ export function NewLink() {
       setLinks((prev) => prev.filter((link) => link.id !== id)); // remove da lista
     } catch (error) {
       console.error("Erro ao deletar link:", error);
+    }
+  };
+
+   const handleCsv = async () => {
+    setDownloadCsv(true);
+    try {
+      const response = await api.get(`/links-csv`);
+      window.location.href = response.data.url;
+      setDownloadCsv(false);
+    } catch (error) {
+      setDownloadCsv(false);
+      console.error("Erro ao baixar links:", error);
     }
   };
 
@@ -136,8 +149,15 @@ export function NewLink() {
         <div className="bg-white p-8 rounded-lg shadow-md w-full flex-1 md:w-[700px]">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Meus links</h2>
-            <button className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-200 transition">
-              Baixar CSV
+            <button 
+              onClick={handleCsv}
+              disabled={downloadCsv}
+              className={`text-sm px-4 py-2 rounded-md border transition ${
+                downloadCsv
+                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+              }`}>
+              {downloadCsv ? "Download..." : "Baixar CSV"}
             </button>
           </div>
 

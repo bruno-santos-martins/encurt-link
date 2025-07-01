@@ -1,22 +1,7 @@
 import notFound from "../img/404.svg";
-import { useEffect } from "react";
-import { api } from "../util/api";
-
-const apitWeb = import.meta.env.VITE_WEB_URL;
 
 export function NotFound() {
 
-
-  useEffect(() => {
-    api
-      .get("/links")
-      .then((response) => {
-        
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar links:", error);
-      });
-  }, []);
 
   return (
    <div className="bg-white px-8 p-20 rounded-lg shadow w-full max-w-md text-center">
