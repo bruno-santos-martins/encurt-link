@@ -2,7 +2,7 @@ import { db } from "@/infra/db/index.js";
 import { schema } from "@/infra/db/schemas/index.js";
 import { type Either, makeLeft, makeRight } from "@/shared/either.js";
 import { z } from "zod";
-import { eq, or } from "drizzle-orm";
+import { eq, or, InferSelectModel } from "drizzle-orm";
 
 const linkInputSchema = z.object({
   url: z.string().url({ message: "URL inválida" }),
@@ -10,10 +10,11 @@ const linkInputSchema = z.object({
 });
 
 type LinkInput = z.infer<typeof linkInputSchema>;
+type Link = InferSelectModel<typeof schema.links>; // ✅ Tipo correto
 
 export async function insertLink(
   input: LinkInput
-): Promise<Either<string, LinkInput>> {
+): Promise<Either<string, Link>> {
   const { url, urlCurt } = linkInputSchema.parse(input);
 
   const existing = await db
@@ -25,7 +26,10 @@ export async function insertLink(
     return makeLeft("URL ou URL encurtada já existem.");
   }
 
-  await db.insert(schema.links).values({ url, urlCurt });
+  const [res] = await db
+    .insert(schema.links)
+    .values({ url, urlCurt })
+    .returning();
 
-  return makeRight({ url, urlCurt });
+  return makeRight<Link>(res);
 }

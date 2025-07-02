@@ -50,6 +50,7 @@ export function NewLink() {
     setSubmitError("");
     try {
       const response = await api.post("/link", data);
+      console.log(response.data);
       setLinks((prev) => [response.data, ...prev]); // Adiciona novo link à lista
       reset(); // limpa o formulário
     } catch (error) {

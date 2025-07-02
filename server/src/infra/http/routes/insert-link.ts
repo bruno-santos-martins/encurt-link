@@ -16,7 +16,13 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
           urlCurt: z.string(),
         }),
 				response: {
-					201: z.string().describe('Cadastro Realizado.'),
+					201: z.object({
+						id: z.string().uuid(),
+						url: z.string().url(),
+						urlCurt: z.string(),
+						visited: z.number(),
+						createdAt: z.string(),
+					}),
 					400: z
 						.object({
 							message: z.string(),
@@ -34,7 +40,16 @@ export const inserLinkRoute: FastifyPluginAsyncZod = async server => {
 			})
 
 			if (isRight(result)) {
-				return reply.status(201).send('Cadastro Realizado')
+			
+				const link = result.right as {
+					id: string;
+					url: string;
+					urlCurt: string;
+					visited: number;
+					createdAt: string;
+				};
+			
+				return reply.status(201).send(link)
 			}
 
 			const error = unwrapEither(result)
