@@ -8,6 +8,8 @@ import { api } from "../util/api";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import { toast, Toaster } from "react-hot-toast";
 
 const apitWeb = import.meta.env.VITE_WEB_URL;
 
@@ -54,7 +56,18 @@ export function NewLink() {
     setSubmitError("");
     try {
       const response = await api.post("/link", data);
-      setLinks((prev) => [response.data, ...prev]); // Adiciona novo link à lista
+      setLinks((prev) => [response.data, ...prev]);
+      toast.custom((t) => (
+        <div
+          className={`flex items-center gap-3 bg-white border border-green-200 shadow-sm px-4 py-3 rounded-md text-sm text-green-700 transition-all 
+          duration-300
+      ${t.visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}
+      `}
+        >
+          <span className="text-green-500 text-lg">✅</span>
+          <span>Sucesso! Sua ação foi concluída.</span>
+        </div>
+      ));
       reset();
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -90,12 +103,13 @@ export function NewLink() {
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col py-8">
+      <Toaster position="top-right" />
       <div className="mb-6 flex justify-center md:justify-start">
         <img src={logo} alt="brev.ly logo" className="h-6" />
         <span className="ml-2 text-[#2C46B1] font-bold">brev.ly</span>
       </div>
 
-      <div className="max-w-none flex flex-col gap-8 md:flex-row md:justify-center">
+      <div className="flex flex-wrap justify-center gap-8">
         {/* Formulário de novo link */}
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -197,24 +211,41 @@ export function NewLink() {
                     <span className="text-sm text-gray-700">
                       {item.visited ?? 0} Acessos
                     </span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          `${apitWeb + item.urlCurt}`
-                        );
-                      }}
-                      title="Copiar link"
-                      className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
-                    >
-                      <img src={iconCopy} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteLink(item.id)}
-                      title="Deletar link"
-                      className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
-                    >
-                      <img src={icontrash} />
-                    </button>
+
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `${apitWeb + item.urlCurt}`
+                              );
+                            }}
+                            className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
+                          >
+                            <img src={iconCopy} />
+                          </button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content className="bg-black text-white text-sm px-2 py-1 rounded">
+                          Deletar link
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <button
+                            onClick={() => handleDeleteLink(item.id)}
+                            className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
+                          >
+                            <img src={icontrash} />
+                          </button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content className="bg-black text-white text-sm px-2 py-1 rounded">
+                          Deletar link
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </div>
                 </div>
               </li>
