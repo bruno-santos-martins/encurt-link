@@ -26,12 +26,16 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-
 export function NewLink() {
   const [downloadCsv, setDownloadCsv] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -50,13 +54,12 @@ export function NewLink() {
     setSubmitError("");
     try {
       const response = await api.post("/link", data);
-      console.log(response.data);
       setLinks((prev) => [response.data, ...prev]); // Adiciona novo link à lista
-      reset(); // limpa o formulário
+      reset();
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         if (error.response?.status === 409 || error.response?.status === 400) {
-        setSubmitError("Este link já está cadastrado.");
+          setSubmitError("Este link já está cadastrado.");
         } else {
           setSubmitError("Erro ao salvar o link. Tente novamente.");
         }
@@ -73,7 +76,7 @@ export function NewLink() {
     }
   };
 
-   const handleCsv = async () => {
+  const handleCsv = async () => {
     setDownloadCsv(true);
     try {
       const response = await api.get(`/links-csv`);
@@ -111,9 +114,7 @@ export function NewLink() {
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.url && (
-              <span className="text-red-500 text-sm">
-                {errors.url.message}
-              </span>
+              <span className="text-red-500 text-sm">{errors.url.message}</span>
             )}
           </div>
 
@@ -133,7 +134,7 @@ export function NewLink() {
               />
             </div>
           </div>
-              {submitError && (
+          {submitError && (
             <div className="mb-4 text-sm text-red-600 font-medium">
               {submitError}
             </div>
@@ -150,14 +151,15 @@ export function NewLink() {
         <div className="bg-white p-8 rounded-lg shadow-md w-full flex-1 md:w-[700px]">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Meus links</h2>
-            <button 
+            <button
               onClick={handleCsv}
               disabled={downloadCsv}
               className={`text-sm px-4 py-2 rounded-md border transition ${
                 downloadCsv
                   ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
                   : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-              }`}>
+              }`}
+            >
               {downloadCsv ? "Download..." : "Baixar CSV"}
             </button>
           </div>
@@ -175,31 +177,42 @@ export function NewLink() {
                 key={i}
                 className="border-b border-gray-200 last:border-b-0 pb-2"
               >
-                <div className="flex justify-between items-start">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                  {/* Coluna do link */}
+                  <div className=" ">
                     <a
                       href={apitWeb + item.urlCurt}
-                      className="text-sm text-blue-600 font-medium hover:underline"
+                      className="text-sm text-blue-600 font-medium hover:underline block"
                     >
                       {apitWeb}
                       {item.urlCurt}
                     </a>
-                    <p className="text-sm text-gray-500">{item.url}</p>
+                    <p className="text-sm text-gray-500 break-words max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.url}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2 pt-1">
+
+                  {/* Coluna de ações */}
+                  <div className="flex items-center gap-2 pt-1 flex-shrink-1">
                     <span className="text-sm text-gray-700">
-                      { item.visited ?? 0 } Acessos
+                      {item.visited ?? 0} Acessos
                     </span>
-                    <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(`${apitWeb + item.urlCurt}`);
-                    }}
-                    title="Copiar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition" >
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${apitWeb + item.urlCurt}`
+                        );
+                      }}
+                      title="Copiar link"
+                      className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
+                    >
                       <img src={iconCopy} />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteLink(item.id)}
-                      title="Deletar link" className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition">
+                      title="Deletar link"
+                      className="p-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200 transition"
+                    >
                       <img src={icontrash} />
                     </button>
                   </div>

@@ -19,9 +19,7 @@ export async function deleteLink(
     .delete(schema.links)
     .where(eq(schema.links.id, id))
     .returning();
-
-  console.log(result.length);
-
+    
   const deleted = result.length ?? 0;
   
   
